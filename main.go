@@ -99,6 +99,7 @@ func main() {
 
 			t := &tempStruct{
 				Namespace: strings.Title(s.namespace),
+				Package:   s.namespace,
 				Class:     c.name,
 			}
 			for _, m := range c.methods {
@@ -156,6 +157,7 @@ type Method struct {
 type tempStruct struct {
 	Namespace string
 	Class     string
+	Package   string
 	Methods   []Method
 }
 
@@ -176,7 +178,7 @@ class {{ .Class }}Server {
         $handler = $implementation;
         $routes = array(
 {{- range .Methods }}
-            '/{{ $.Namespace }}.{{ $.Class }}/{{ .Name }}' => function($body) {
+            '/{{ $.Package }}.{{ $.Class }}/{{ .Name }}' => function($body) {
                 $req = new {{ .Input }};
                 $req->mergeFromString($body);
                 $resp = $handler->{{ .Name }}($req);

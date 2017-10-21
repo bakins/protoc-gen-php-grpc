@@ -12,7 +12,7 @@ class GreeterServer {
     function __construct(GreeterService $implementation) {
         $handler = $implementation;
         $routes = array(
-            '/Helloworld.Greeter/SayHello' => function($body) {
+            '/helloworld.Greeter/SayHello' => function($body) {
                 $req = new HelloRequest;
                 $req->mergeFromString($body);
                 $resp = $handler->SayHello($req);
