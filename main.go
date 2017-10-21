@@ -116,7 +116,7 @@ func main() {
 				Error(err, "failed to execute template")
 			}
 
-			filename := filepath.Join(strings.Title(s.namespace), c.name+".grpc.server.php")
+			filename := filepath.Join(strings.Title(s.namespace), c.name+"Server.php")
 			content := buff.String()
 			f := &pb.CodeGeneratorResponse_File{
 				Name:    &filename,
@@ -162,7 +162,7 @@ type tempStruct struct {
 var classTemplate = `<?php
 namespace {{ .Namespace }};
 
-interface {{ .Class }} {
+interface {{ .Class }}Service {
 {{- range .Methods }}
     public function {{ .Name }}({{ .Input }} $req) : {{ .Output }};
 {{- end }}
@@ -172,7 +172,7 @@ class {{ .Class }}Server {
     private $routes;
     private $handler;
 
-    function __construct({{ .Class }} $implementation) {
+    function __construct({{ .Class }}Service $implementation) {
         $handler = $implementation;
         $routes = array(
 {{- range .Methods }}

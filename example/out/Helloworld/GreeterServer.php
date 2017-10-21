@@ -1,7 +1,7 @@
 <?php
 namespace Helloworld;
 
-interface Greeter {
+interface GreeterService {
     public function SayHello(HelloRequest $req) : HelloReply;
 }
 
@@ -9,7 +9,7 @@ class GreeterServer {
     private $routes;
     private $handler;
 
-    function __construct(Greeter $implementation) {
+    function __construct(GreeterService $implementation) {
         $handler = $implementation;
         $routes = array(
             '/Helloworld.Greeter/SayHello' => function($body) {
