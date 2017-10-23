@@ -20,7 +20,7 @@ option java_outer_classname = "HelloWorldProto";
 option objc_class_prefix = "HLW";
 */
 
-package helloworld;
+package helloworld.v1;
 
 // The greeting service definition.
 service Greeter {

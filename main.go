@@ -31,8 +31,9 @@ type class struct {
 	methods []*method
 }
 type server struct {
-	namespace string
-	classes   map[string]*class
+	namespace    string
+	protoPackage string
+	classes      map[string]*class
 }
 
 func main() {
@@ -62,13 +63,15 @@ func main() {
 			return
 		}
 
-		s, ok := servers[*file.Package]
+		namespace := phpNamespace(*file.Package)
+		s, ok := servers[namespace]
 		if !ok {
 			s = &server{
-				namespace: *file.Package,
-				classes:   map[string]*class{},
+				namespace:    namespace,
+				protoPackage: *file.Package,
+				classes:      map[string]*class{},
 			}
-			servers[*file.Package] = s
+			servers[namespace] = s
 		}
 
 		for _, svc := range file.Service {
@@ -82,8 +85,8 @@ func main() {
 			for _, meth := range svc.Method {
 				m := method{
 					name:   *meth.Name,
-					input:  stripPackage(*meth.InputType),
-					output: stripPackage(*meth.OutputType),
+					input:  messageType(*meth.InputType),
+					output: messageType(*meth.OutputType),
 				}
 				c.methods = append(c.methods, &m)
 			}
@@ -95,8 +98,8 @@ func main() {
 		for _, c := range s.classes {
 
 			t := &tempStruct{
-				Namespace: strings.Title(s.namespace),
-				Package:   s.namespace,
+				Namespace: s.namespace,
+				Package:   s.protoPackage,
 				Class:     c.name,
 			}
 			for _, m := range c.methods {
@@ -114,7 +117,10 @@ func main() {
 				Error(err, "failed to execute template")
 			}
 
-			filename := filepath.Join(strings.Title(s.namespace), c.name+"Server.php")
+			parts := strings.Split(s.namespace, `\`)
+			parts = append(parts, c.name+"Server.php")
+			//filename := filepath.Join(strings.Title(s.namespace), c.name+"Server.php")
+			filename := filepath.Join(parts...)
 			content := buff.String()
 			f := &pb.CodeGeneratorResponse_File{
 				Name:    &filename,
@@ -137,6 +143,20 @@ func main() {
 	if err != nil {
 		Error(err, "failed to write output proto")
 	}
+}
+
+func phpNamespace(in string) string {
+	parts := strings.Split(in, ".")
+	for i, p := range parts {
+		parts[i] = strings.Title(p)
+	}
+	return strings.Join(parts, `\`)
+}
+
+func messageType(in string) string {
+	parts := strings.Split(in, ".")
+	m := parts[len(parts)-1]
+	return phpNamespace(strings.Join(parts[:len(parts)-1], `\`) + `\` + m)
 }
 
 func stripPackage(in string) string {

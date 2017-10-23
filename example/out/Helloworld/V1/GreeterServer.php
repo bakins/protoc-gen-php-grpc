@@ -1,8 +1,8 @@
 <?php
-namespace Helloworld;
+namespace Helloworld\V1;
 
 interface GreeterService {
-    public function SayHello(HelloRequest $req) : HelloReply;
+    public function SayHello(\Helloworld\V1\HelloRequest $req) : \Helloworld\V1\HelloReply;
 }
 
 class GreeterServer {
@@ -12,8 +12,8 @@ class GreeterServer {
     function __construct(GreeterService $implementation) {
         $handler = $implementation;
         $routes = array(
-            '/helloworld.Greeter/SayHello' => function($body) {
-                $req = new HelloRequest;
+            '/helloworld.v1.Greeter/SayHello' => function($body) {
+                $req = new \Helloworld\V1\HelloRequest;
                 $req->mergeFromString($body);
                 $resp = $handler->SayHello($req);
                 return $resp->serializeToString();
