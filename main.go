@@ -14,6 +14,7 @@ import (
 	pb "github.com/golang/protobuf/protoc-gen-go/plugin"
 )
 
+// Error prints an error and exits
 func Error(err error, msgs ...string) {
 	s := strings.Join(msgs, " ") + ":" + err.Error()
 	log.Print("protoc-gen-go: error:", s)
@@ -30,6 +31,7 @@ type class struct {
 	name    string
 	methods []*method
 }
+
 type server struct {
 	namespace    string
 	protoPackage string
@@ -37,7 +39,6 @@ type server struct {
 }
 
 func main() {
-
 	temp := template.Must(template.New("grpc").Parse(classTemplate))
 
 	data, err := ioutil.ReadAll(os.Stdin)
@@ -57,7 +58,7 @@ func main() {
 	files := []*pb.CodeGeneratorResponse_File{}
 	servers := map[string]*server{}
 
-	for i, _ := range req.FileToGenerate {
+	for i := range req.FileToGenerate {
 		file := req.ProtoFile[i]
 		if len(file.Service) == 0 {
 			return
@@ -119,7 +120,6 @@ func main() {
 
 			parts := strings.Split(s.namespace, `\`)
 			parts = append(parts, c.name+"Server.php")
-			//filename := filepath.Join(strings.Title(s.namespace), c.name+"Server.php")
 			filename := filepath.Join(parts...)
 			content := buff.String()
 			f := &pb.CodeGeneratorResponse_File{
@@ -157,11 +157,6 @@ func messageType(in string) string {
 	parts := strings.Split(in, ".")
 	m := parts[len(parts)-1]
 	return phpNamespace(strings.Join(parts[:len(parts)-1], `\`) + `\` + m)
-}
-
-func stripPackage(in string) string {
-	parts := strings.Split(in, ".")
-	return parts[len(parts)-1]
 }
 
 // Method ...
