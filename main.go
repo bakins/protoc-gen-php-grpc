@@ -47,7 +47,7 @@ func main() {
 	}
 
 	req := pb.CodeGeneratorRequest{}
-	if err := proto.Unmarshal(data, &req); err != nil {
+	if err = proto.Unmarshal(data, &req); err != nil {
 		Error(err, "parsing input proto")
 	}
 
@@ -114,7 +114,7 @@ func main() {
 			}
 
 			buff := &bytes.Buffer{}
-			if err := temp.Execute(buff, t); err != nil {
+			if err = temp.Execute(buff, t); err != nil {
 				Error(err, "failed to execute template")
 			}
 
